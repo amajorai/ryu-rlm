@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ryu.rlm",
+  "version": "1.0.0",
+  "description": "Recursive Language Models: answer questions about a corpus far larger than a context window by holding it outside the prompt and reading it through a planner, a cheap per-chunk reader, and recursion.",
+  "keywords": [
+    "long-context",
+    "recursion",
+    "retrieval",
+    "citations",
+    "map-reduce"
+  ],
+  "extensions": {
+    "com.ryuhq.ryu": {
+      "id": "@ryu/rlm",
+      "displayName": "Recursive Language Model"
+    }
+  }
+}
