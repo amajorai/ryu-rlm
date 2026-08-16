@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ryu.rlm",
+  "version": "0.1.14",
+  "description": "Answer questions about a corpus far larger than any model's context window — without putting it in a prompt. The usual options all degrade: truncate and you lose the answer, embed-and-retrieve and you get fragments without their argument, buy a bigger window and attention over the middle of it thins out anyway. This app does the other thing. Your documents are held here as a variable. A root model plans over an outline of them — chunk ids, sources, line spans, headings — and reaches the text only through operators that summarise before returning: `grep` to locate, `map` to run a cheap model over the chunks that matter in parallel and fold the answers back, `recurse` to give a sub-question its own plan over a subset. The root model never sees the corpus, so its context stays roughly the same size whether you point it at 40 KB or 40 MB, and the answer does not get worse as the input gets bigger. Every answer carries `path:line` citations read back out of the chunks it rests on, and every run keeps a full trace — each operator, each sub-call, what it cost — that you can open and replay. Depth, step, call and wall-clock budgets are hard: a run that hits one says so and returns what it had, rather than quietly shortening the answer. Agents get the same engine as tools, and `grep` and `peek` need no model at all, so a workflow can branch on a deterministic search of a 40 MB corpus.",
+  "keywords": [
+    "long-context",
+    "recursion",
+    "retrieval",
+    "documents",
+    "citations",
+    "map-reduce",
+    "context-window",
+    "research"
+  ],
+  "extensions": {
+    "com.ryuhq.ryu": {
+      "id": "@ryu/rlm",
+      "displayName": "Recursive Language Model",
+      "mcp": {
+        "rlm": {
+          "description": "Read more than fits in your context. `ask` takes paths and a question and returns an answer with `path:line` citations — the files never enter this conversation, so reach for it instead of reading a large directory yourself. `load` builds a reusable context, `query` asks follow-up questions against one, and `grep` and `peek` search and read it with NO model call at all, which makes them safe to branch a workflow on."
+        }
+      }
+    }
+  }
+}
