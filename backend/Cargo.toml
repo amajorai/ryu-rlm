@@ -1,0 +1,49 @@
+[package]
+name = "ryu-rlm"
+# The version the publish train is on. `tools/publish-crates.sh` reads TRAIN_VERSION
+# from the FIRST crate in its list and requires every crate in the set to be on it,
+# so an apps-store backend that drifts to its own version silently breaks the
+# release. Every other `apps-store/*/backend` is on 0.1.11; so is this one.
+version = "0.2.3"
+edition = "2021"
+license = "Apache-2.0"
+description = "Recursive Language Models for Ryu: answer questions over a context far larger than any model's window WITHOUT putting it in a prompt. The context is held here as a variable; a root model plans over it with a closed operator vocabulary (outline/peek/grep/map/recurse), sub-model calls read one slice each, and their findings fold back up. The root model never sees the corpus, so its own context stays bounded no matter how big the input is. Ships the chunker, the operator interpreter, the recursion engine with hard depth/call/token/wall budgets, the replayable trace, and the HTTP + MCP surfaces. ZERO dependency on apps/core — the sidecar reaches the host only over the generic `/api/host/model/complete` callback."
+repository = "https://github.com/amajorai/ryu"
+
+# Sidecar-ONLY: this crate is a process, not a library Core links. The shape is
+# `ryu-reasoning`'s — one `[[bin]]`, modules declared in `lib.rs`, and no `apps/core`
+# dependency in either direction. Core reaches this app exclusively through the
+# generic ext-proxy (`public_mount` at `/api/rlm`).
+[[bin]]
+name = "ryu-rlm"
+path = "src/main.rs"
+
+[lib]
+name = "ryu_rlm"
+path = "src/lib.rs"
+
+# Versions are matched to apps/core/Cargo.toml so a future in-process merge has no
+# version skew. This crate has ZERO dependency on apps/core.
+[dependencies]
+ryu-sidecar-runtime = { path = "../crates/core/sidecar-runtime", version = "0.2.3" }
+tokio = { version = "1", features = ["full"] }
+axum = "0.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+reqwest = { version = "0.12", features = ["json"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dirs = "5"
+regex = "1"
+tower-http = { version = "0.5", features = ["cors"] }
+# The OpenAPI document Core fetches from `/openapi.json` to derive this app's LLM
+# tools. Without it the sidecar's ten routes contribute NOTHING an agent can call —
+# Core's importer has no other source for a route's arguments. Pinned to the 5.5.0
+# the workspace already resolves (there is no `utoipa-axum` in the graph, which is
+# why the `paths(...)` list below is hand-written rather than collected from the
+# router).
+utoipa = { version = "5", features = ["axum_extras", "chrono", "uuid"] }
